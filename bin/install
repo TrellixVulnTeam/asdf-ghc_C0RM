@@ -1,3 +1,41 @@
 #!/usr/bin/env bash
-plugin_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-(cd $plugin_dir && ansible-playbook site.yml -e "ghc_version=${ASDF_INSTALL_VERSION} ghc_prefix_dir=${ASDF_INSTALL_PATH}")
+filename() {
+  local version=$ASDF_INSTALL_VERSION
+  local platform=$(uname -m)
+  case "$version" in
+    "8.6"*)
+      echo "ghc-${version}-${platform}-deb9-linux"
+      ;;
+    "8.4"*)
+      echo "ghc-${version}-${platform}-deb9-linux"
+      ;;
+    "8.2"*)
+      echo "ghc-${version}-${platform}-deb8-linux"
+      ;;
+    "8.0"*)
+      echo "ghc-${version}-${platform}-deb8-linux"
+      ;;
+    "7.10"*)
+      echo "ghc-${version}-${platform}-deb8-linux"
+      ;;
+    "7.8"*)
+      echo "ghc-${version}-${platform}-unknown-linux-deb7"
+      ;;
+  esac
+}
+
+version=$ASDF_INSTALL_VERSION
+url="https://downloads.haskell.org/~ghc/${version}/$(filename).tar.xz"
+file="${ASDF_INSTALL_PATH}/ghc-${version}"
+tarball="${file}.tar.xz"
+
+curl -o $tarball $url
+tar xvf $tarball -C $ASDF_INSTALL_PATH
+rm $tarball
+
+(cd $file && {
+  ./configure --prefix $ASDF_INSTALL_PATH
+  make install
+})
+
+rm -r $file

@@ -1,4 +1,0 @@
----
-- name: ghc
-  src: git@github.com:sestrella/ansible-role-ghc.git
-  scm: git
