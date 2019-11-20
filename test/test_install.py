@@ -11,7 +11,7 @@ class TestInstall(unittest.TestCase):
             # self.assertIn(b'8.8.1', version)
     def test_assets_urls(self):
         url = 'https://downloads.haskell.org/~ghc/8.8.1'
-        urls = list(lib.install.assets_urls('8.8.1'))
+        urls = list(lib.install.assets_urls('8.8.1', 'linux', 'x86_64'))
         self.assertEqual(urls, [
             (f"{url}/ghc-8.8.1-x86_64-centos7-linux.tar.xz", ['centos7']),
             (f"{url}/ghc-8.8.1-x86_64-deb8-linux.tar.xz", ['deb8']),
