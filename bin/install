@@ -1,41 +1,48 @@
-#!/usr/bin/env bash
-filename() {
-  local version=$ASDF_INSTALL_VERSION
-  local platform=$(uname -m)
-  case "$version" in
-    "8.6"*)
-      echo "ghc-${version}-${platform}-deb9-linux"
+#!/bin/bash
+
+VERSION=$ASDF_INSTALL_VERSION
+BASE_URL="https://downloads.haskell.org/~ghc/${VERSION}/"
+
+asd() {
+  local download_dir="/home/sestrella/tmp"
+  curl -o "$download_dir/ghc.tar.xz" $(download_url)
+  ls $download_dir
+}
+
+download_url() {
+  local assets=$(available_assets)
+  local filename=$(filter_assets "$assets" 0 || filter_assets "$assets" 1)
+  echo "${BASE_URL}${filename}"
+}
+
+filter_assets() {
+  echo "$1" | compatible_assets "$2"
+}
+
+available_assets() {
+  curl -s --compressed "$BASE_URL" | href | grep "^ghc-${VERSION}" | grep -v '\.sig$'
+}
+
+href() {
+  grep -o 'href=".*"' | sed 's/href="//g' | sed 's/"//g'
+}
+
+compatible_assets() {
+  local bar=$(distro $1)
+  grep "$bar" | grep 'tar.xz$'
+}
+
+distro() {
+  local release=$(lsb_release -rs)
+  local index=$1
+  case "$(lsb_release -is)" in
+    Debian)
+      echo "$(uname -m)-deb$((release - index))"
       ;;
-    "8.4"*)
-      echo "ghc-${version}-${platform}-deb9-linux"
-      ;;
-    "8.2"*)
-      echo "ghc-${version}-${platform}-deb8-linux"
-      ;;
-    "8.0"*)
-      echo "ghc-${version}-${platform}-deb8-linux"
-      ;;
-    "7.10"*)
-      echo "ghc-${version}-${platform}-deb8-linux"
-      ;;
-    "7.8"*)
-      echo "ghc-${version}-${platform}-unknown-linux-deb7"
+    *)
+      echo "unknown"
       ;;
   esac
 }
 
-version=$ASDF_INSTALL_VERSION
-url="https://downloads.haskell.org/~ghc/${version}/$(filename).tar.xz"
-file="${ASDF_INSTALL_PATH}/ghc-${version}"
-tarball="${file}.tar.xz"
-
-curl -o $tarball $url
-tar xvf $tarball -C $ASDF_INSTALL_PATH
-rm $tarball
-
-(cd $file && {
-  ./configure --prefix $ASDF_INSTALL_PATH
-  make install
-})
-
-rm -r $file
+asd
