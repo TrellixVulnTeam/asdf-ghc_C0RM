@@ -18,23 +18,15 @@ NAMES = {
 
 def install(install_dir, version):
   urls = __compatible_urls(__downloadable_urls(version))
-  info = __distro()
-  url = __specific_url(urls, info)
+  url = __specific_url(urls, __distro())
   return __install_from_url(install_dir, version, url)
 
 def __specific_url(urls, info):
-  filtered_urls = filter(lambda url: f'{info[0]}{info[1]}' in url and url.endswith('tar.xz'), urls)
+  filtered_urls = filter(
+    lambda url: f'{info[0]}{info[1]}' in url and url.endswith('tar.xz'),
+    urls
+  )
   return next(filtered_urls, None)
-
-def __install_from_url(install_dir, version, url):
-  with tempfile.TemporaryDirectory() as download_dir:
-    path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
-    with tarfile.open(path) as tar:
-      tar.extractall(download_dir)
-      working_dir = f'{download_dir}/ghc-{version}'
-      subprocess.run(['./configure', f'--prefix={install_dir}'], cwd=working_dir)
-      subprocess.run(['make', 'install'], cwd=working_dir)
-      return True
 
 def __distro():
   info = __os_release()
@@ -60,14 +52,21 @@ def __downloadable_urls(version):
     targets = re.findall('href="(.*)"', html)
     return map(
       lambda filename: f'{base_url}{filename}',
-      filter(__is_downlodable(version), targets)
+      filter(lambda target: __is_downlodable(version, target), targets)
     )
 
-def __is_downlodable(version):
-  def zoo(target):
-    return target.startswith(f'ghc-{version}') and not target.endswith('.sig')
+def __is_downlodable(version, target):
+  return target.startswith(f'ghc-{version}') and not target.endswith('.sig')
 
-  return zoo
+def __install_from_url(install_dir, version, url):
+  with tempfile.TemporaryDirectory() as download_dir:
+    path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
+    with tarfile.open(path) as tar:
+      tar.extractall(download_dir)
+      working_dir = f'{download_dir}/ghc-{version}'
+      subprocess.run(['./configure', f'--prefix={install_dir}'], cwd=working_dir)
+      subprocess.run(['make', 'install'], cwd=working_dir)
+      return True
 
 if __name__ == '__main__':
   install_dir = os.environ['ASDF_INSTALL_PATH']
