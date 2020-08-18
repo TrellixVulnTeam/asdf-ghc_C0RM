@@ -18,10 +18,10 @@ NAMES = {
 
 def install(install_dir, version):
   urls = list(__compatible_urls(__downloadable_urls(version)))
-  info = __distro()
-  return __todo(install_dir, version, info, 0, urls) or __todo(install_dir, version, info, 1, urls)
+  info = __distro_info()
+  return __install_from_urls(install_dir, version, info, 0, urls) or __install_from_urls(install_dir, version, info, 1, urls)
 
-def __todo(install_dir, version, info, index, urls):
+def __install_from_urls(install_dir, version, info, index, urls):
   url = __specific_url(info, index, urls)
   return __install_from_url(install_dir, version, url)
 
@@ -32,7 +32,7 @@ def __specific_url(info, index, urls):
   )
   return next(filtered_urls, None)
 
-def __distro():
+def __distro_info():
   info = __os_release()
   return (NAMES[info['ID']], int(info['VERSION_ID']))
 
