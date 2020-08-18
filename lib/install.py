@@ -17,13 +17,17 @@ NAMES = {
 }
 
 def install(install_dir, version):
-  urls = __compatible_urls(__downloadable_urls(version))
-  url = __specific_url(urls, __distro())
+  urls = list(__compatible_urls(__downloadable_urls(version)))
+  info = __distro()
+  return __todo(install_dir, version, info, 0, urls) or __todo(install_dir, version, info, 1, urls)
+
+def __todo(install_dir, version, info, index, urls):
+  url = __specific_url(info, index, urls)
   return __install_from_url(install_dir, version, url)
 
-def __specific_url(urls, info):
+def __specific_url(info, index, urls):
   filtered_urls = filter(
-    lambda url: f'{info[0]}{info[1]}' in url and url.endswith('tar.xz'),
+    lambda url: f'{info[0]}{info[1] - index}' in url and url.endswith('tar.xz'),
     urls
   )
   return next(filtered_urls, None)
@@ -43,13 +47,20 @@ def __os_release():
 def __compatible_urls(urls):
   arch = platform.machine()
   os = sys.platform
-  return filter(lambda url: arch in url and os in url, urls);
+  return filter(
+    lambda url: arch in url and os in url and not 'dwarf' in url,
+    urls
+  )
 
 def __downloadable_urls(version):
   base_url = f'https://downloads.haskell.org/~ghc/{version}/'
   with urllib.request.urlopen(base_url) as resp:
-    html = gzip.decompress(resp.read()).decode('utf-8')
-    targets = re.findall('href="(.*)"', html)
+    html = resp.read()
+
+    if resp.getheader('content-encoding') == 'gzip':
+      html = gzip.decompress(html)
+
+    targets = re.findall('href="(.*)"', html.decode('utf-8'))
     return map(
       lambda filename: f'{base_url}{filename}',
       filter(lambda target: __is_downlodable(version, target), targets)
@@ -59,6 +70,9 @@ def __is_downlodable(version, target):
   return target.startswith(f'ghc-{version}') and not target.endswith('.sig')
 
 def __install_from_url(install_dir, version, url):
+  if not url:
+    return False
+
   with tempfile.TemporaryDirectory() as download_dir:
     path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
     with tarfile.open(path) as tar:
