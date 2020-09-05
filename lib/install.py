@@ -1,7 +1,11 @@
+import os
+
+
 def install(install_dir, version):
-  return None
+    return None
+
 
 if __name__ == '__main__':
-  install_dir = os.environ['ASDF_INSTALL_PATH']
-  version = os.environ['ASDF_INSTALL_VERSION']
-  install(install_dir, version)
+    install_dir = os.environ['ASDF_INSTALL_PATH']
+    version = os.environ['ASDF_INSTALL_VERSION']
+    install(install_dir, version)
