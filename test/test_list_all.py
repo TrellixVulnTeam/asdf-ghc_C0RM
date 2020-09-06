@@ -8,4 +8,7 @@ class TestListAll(unittest.TestCase):
     def test_list_all(self):
         printer = Mock()
         list_all(printer)
-        self.assertIn('8.10.1', printer.call_args.args[0])
+        versions = printer.call_args.args[0]
+        self.assertIn('8.10.2', versions)
+        self.assertIn('8.8.4', versions)
+        self.assertIn('8.6.5', versions)

@@ -8,17 +8,22 @@ URL = 'https://downloads.haskell.org/~ghc/'
 
 
 def list_all(printer=print):
-  print(list(map(lambda a: str(a), sorted(list(__bar(__foo()))))))
+    versions = sorted(__extract_versions(__downloads_page()))
+    printer(' '.join(__versions_to_string(versions)))
 
 
-def __bar(html):
+def __versions_to_string(versions):
+    return map(lambda version: str(version), versions)
+
+
+def __extract_versions(page):
     return map(
         lambda version: StrictVersion(version),
-        re.findall('(?<=href=")([0-9]+\.[0-9]+\.[0-9]+)(?=/")', html)
+        re.findall('(?<=href=")([0-9]+.[0-9]+.[0-9]+)(?=/")', page)
     )
 
 
-def __foo():
+def __downloads_page():
     with urllib.request.urlopen(URL) as resp:
         return gzip.decompress(resp.read()).decode('utf-8')
 
