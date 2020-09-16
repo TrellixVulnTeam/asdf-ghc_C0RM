@@ -6,10 +6,10 @@ import unittest
 
 
 class TestInstall(unittest.TestCase):
-    def test_install_8_10_1(self):
+    def test_install_8_10_2(self):
         with tempfile.TemporaryDirectory() as install_dir:
-            install(install_dir, '8.10.1')
+            install(install_dir, '8.10.2')
             output = subprocess.check_output(
                 [f'{install_dir}/bin/ghc', '--version']
             )
-            self.assertIn(b'8.10.1', output)
+            self.assertIn(b'8.10.2', output)
