@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 import gzip
 import os
@@ -27,11 +28,13 @@ class Distro:
 class Filename:
   filename: str
   distro: Distro
+  extras: List[str]
 
   def __init__(self, filename):
     values = filename.replace('.tar.xz', '').split('-')
     self.filename = filename
-    self.distro = Distro(values[3]) if len(values) >= 2 else None
+    self.distro = Distro(values[3])
+    self.extras = values[5:]
     print(values)
 
 
@@ -46,12 +49,15 @@ def __get_filenames(version):
     def is_tarball(filename):
       return ARCH in filename and OS in filename and filename.endswith('.tar.xz')
 
+    def by_distro(filename):
+      return filename.distro.version
+
     with urllib.request.urlopen(f'{BASE_URL}{version}/') as resp:
         content = gzip.decompress(resp.read()).decode('utf-8')
-        return map(
+        return list(map(
           Filename,
           filter(is_tarball, re.findall('(?<=href=")(ghc-.*)(?=")', content))
-        )
+        )).sort(key=by_distro)
 
 
 def __filename(filename):
