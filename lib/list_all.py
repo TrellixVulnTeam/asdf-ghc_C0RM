@@ -25,7 +25,7 @@ def __extract_versions(page):
 
 def __downloads_page():
     with urllib.request.urlopen(URL) as resp:
-        return gzip.decompress(resp.read()).decode('utf-8')
+        return resp.read().decode('utf-8')
 
 
 if __name__ == '__main__':

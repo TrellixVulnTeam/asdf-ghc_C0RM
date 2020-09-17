@@ -6,6 +6,13 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - debian10
+          - debian9
+
     steps:
       - uses: actions/checkout@v2
-      - run: docker-compose build
+      - run: docker-compose build ${{ matrix.service }}
