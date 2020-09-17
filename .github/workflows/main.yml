@@ -9,8 +9,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: python --version
-      - run: python -m unittest
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - run: python3 --version
+      - run: python3 -m unittest
 
   build-linux:
     runs-on: ubuntu-latest
