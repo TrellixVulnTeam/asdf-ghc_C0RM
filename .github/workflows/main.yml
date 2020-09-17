@@ -4,7 +4,14 @@ name: actions
 on: [push]
 
 jobs:
-  build:
+  build-darwin:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: python -m unittest
+
+  build-linux:
     runs-on: ubuntu-latest
 
     strategy:
