@@ -7,9 +7,9 @@ import urllib.request
 URL = 'https://downloads.haskell.org/~ghc/'
 
 
-def list_all(printer=print):
+def list_all():
     versions = sorted(__extract_versions(__downloads_page()))
-    printer(' '.join(__versions_to_string(versions)))
+    return ' '.join(__versions_to_string(versions))
 
 
 def __versions_to_string(versions):
@@ -29,4 +29,4 @@ def __downloads_page():
 
 
 if __name__ == '__main__':
-    list_all()
+    print(list_all())
