@@ -18,15 +18,16 @@ def install(install_dir, version):
 
 def __filter_by_distro(filenames):
     distro = __normalize_distro(subprocess.check_output(['lsb_release', '-irs']))
-    print(distro)
-
     def by_distro(filename):
-      return filename['distro']['name'] == 'deb'
+      return distro['name'] == filename['distro']['name'] and distro['version'] >= filename['distro']['version']
 
     return filter(by_distro, filenames)
 
 def __normalize_distro(distro):
   values = distro.decode('utf-8').split()
+  if values[0] == 'Debian':
+    return { 'name': 'deb', 'version': float(values[1]) }
+
   return { 'name': values[0], 'version': float(values[1]) }
 
 def __get_filenames(version):
