@@ -1,4 +1,3 @@
-import gzip
 import os
 import platform
 import re
@@ -25,23 +24,25 @@ def install(install_dir, version):
 
 
 def __downloadable_filename(filenames):
-  def no_extras(filename):
-    return len(filename['extras']) == 0
+    def no_extras(filename):
+        return len(filename['extras']) == 0
 
-  return next(filter(no_extras, filenames))
+    return next(filter(no_extras, filenames))
 
 
 def __sort_by_distro_version(filenames):
-  def by_distro_version(filename):
-    return filename['distro']['version']
+    def by_distro_version(filename):
+        return filename['distro']['version']
 
-  return sorted(filenames, key=by_distro_version, reverse=True)
+    return sorted(filenames, key=by_distro_version, reverse=True)
 
 
 def __filter_by_distro(filenames):
     distro = __normalize_distro(subprocess.check_output(['lsb_release', '-irs']))
     def by_distro(filename):
-      return distro['name'] == filename['distro']['name'] and distro['version'] >= filename['distro']['version']
+        is_name_eq = distro['name'] == filename['distro']['name']
+        is_version_gteq = distro['version'] >= filename['distro']['version']
+        return is_name_eq and is_version_gteq
 
     return filter(by_distro, filenames)
 
