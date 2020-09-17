@@ -1,0 +1,13 @@
+---
+version: '3'
+
+services:
+  debian10:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/debian10.Dockerfile
+
+  debian9:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/debian9.Dockerfile
