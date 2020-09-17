@@ -19,7 +19,7 @@ def install(install_dir, version):
     return __download_and_install(
       install_dir,
       version,
-      f"{BASE_URL}/{version}/{filename['filename']}"
+      '%s/%s/%s' % (BASE_URL, version, filename['filename'])
     )
 
 
@@ -65,7 +65,7 @@ def __get_filenames(version):
         is_os = OS in filename
         return is_arch and is_os and filename.endswith('tar.xz')
 
-    with urllib.request.urlopen(f'{BASE_URL}/{version}/') as resp:
+    with urllib.request.urlopen('%s/%s/' % (BASE_URL, version)) as resp:
         content = resp.read().decode('utf-8')
         return map(
           __parse_filename,
@@ -89,12 +89,12 @@ def __parse_distro(distro):
 
 def __download_and_install(install_dir, version, url):
     with tempfile.TemporaryDirectory() as download_dir:
-        path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
+        path, _ = urllib.request.urlretrieve(url, '%s/ghc.tar.xz' % download_dir)
         with tarfile.open(path) as tar:
             tar.extractall(download_dir)
-            working_dir = f'{download_dir}/ghc-{version}'
+            working_dir = '%s/ghc-%s' % (download_dir, version)
             subprocess.run(
-                ['./configure', f'--prefix={install_dir}'],
+                ['./configure', '--prefix=%s' % install_dir],
                 cwd=working_dir
             )
             subprocess.run(
