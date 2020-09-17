@@ -38,24 +38,32 @@ def __sort_by_distro_version(filenames):
 
 
 def __filter_by_distro(filenames):
-    distro = __normalize_distro(subprocess.check_output(['lsb_release', '-irs']))
+    distro = __normalize_distro(
+        subprocess.check_output(['lsb_release', '-irs'])
+    )
+
     def by_distro(filename):
-        is_name_eq = distro['name'] == filename['distro']['name']
-        is_version_gteq = distro['version'] >= filename['distro']['version']
-        return is_name_eq and is_version_gteq
+        is_name = distro['name'] == filename['distro']['name']
+        is_version = distro['version'] >= filename['distro']['version']
+        return is_name and is_version
 
     return filter(by_distro, filenames)
 
-def __normalize_distro(distro):
-  values = distro.decode('utf-8').split()
-  if values[0] == 'Debian':
-    return { 'name': 'deb', 'version': float(values[1]) }
 
-  return { 'name': values[0], 'version': float(values[1]) }
+def __normalize_distro(distro):
+    values = distro.decode('utf-8').split()
+
+    if values[0] == 'Debian':
+        return {'name': 'deb', 'version': float(values[1])}
+
+    return {'name': values[0], 'version': float(values[1])}
+
 
 def __get_filenames(version):
     def is_tarball(filename):
-      return ARCH in filename and OS in filename and filename.endswith('.tar.xz')
+        is_arch = ARCH in filename
+        is_os = OS in filename
+        return is_arch and is_os and filename.endswith('tar.xz')
 
     with urllib.request.urlopen(f'{BASE_URL}/{version}/') as resp:
         content = resp.read().decode('utf-8')
@@ -75,18 +83,24 @@ def __parse_filename(filename):
 
 
 def __parse_distro(distro):
-    values = next(iter(re.findall('([a-z]+)(\d+)', distro)))
-    return { 'name': values[0], 'version': float(values[1]) }
+    values = next(iter(re.findall('([a-z]+)(.+)', distro)))
+    return {'name': values[0], 'version': float(values[1])}
 
 
 def __download_and_install(install_dir, version, url):
-  with tempfile.TemporaryDirectory() as download_dir:
-    path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
-    with tarfile.open(path) as tar:
-      tar.extractall(download_dir)
-      working_dir = f'{download_dir}/ghc-{version}'
-      subprocess.run(['./configure', f'--prefix={install_dir}'], cwd=working_dir)
-      subprocess.run(['make', 'install'], cwd=working_dir)
+    with tempfile.TemporaryDirectory() as download_dir:
+        path, _ = urllib.request.urlretrieve(url, f"{download_dir}/ghc.tar.xz")
+        with tarfile.open(path) as tar:
+            tar.extractall(download_dir)
+            working_dir = f'{download_dir}/ghc-{version}'
+            subprocess.run(
+                ['./configure', f'--prefix={install_dir}'],
+                cwd=working_dir
+            )
+            subprocess.run(
+                ['make', 'install'],
+                cwd=working_dir
+            )
 
 
 if __name__ == '__main__':
