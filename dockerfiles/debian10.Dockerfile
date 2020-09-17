@@ -10,4 +10,6 @@ RUN apt-get update && \
 COPY . /root/project
 
 WORKDIR /root/project
+
+RUN /usr/bin/python3 --version
 RUN /usr/bin/python3 -m unittest
