@@ -9,6 +9,5 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - run: brew install python
       - run: python3 --version
       - run: python3 -m unittest
