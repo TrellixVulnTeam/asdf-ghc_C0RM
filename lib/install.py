@@ -38,6 +38,7 @@ def __sort_by_distro_version(filenames):
 
 
 def __filter_by_distro(filenames):
+    print(filenames)
     distro = __normalize_distro(
         subprocess.check_output(['lsb_release', '-irs'])
     )
