@@ -1,3 +1,5 @@
+from lib.install.filename import parse_filename
+
 import os
 import platform
 import re
@@ -38,7 +40,6 @@ def __sort_by_distro_version(filenames):
 
 
 def __filter_by_distro(filenames):
-    print(filenames)
     distro = __normalize_distro(
         subprocess.check_output(['lsb_release', '-irs'])
     )
@@ -69,28 +70,17 @@ def __get_filenames(version):
     with urllib.request.urlopen('%s/%s/' % (BASE_URL, version)) as resp:
         content = resp.read().decode('utf-8')
         return map(
-          __parse_filename,
+          parse_filename,
           filter(is_tarball, re.findall('(?<=href=")(ghc-.*)(?=")', content))
         )
 
 
-def __parse_filename(filename):
-    values = filename.replace('.tar.xz', '').split('-')
-    return {
-      'filename': filename,
-      'distro': __parse_distro(values[3]),
-      'extras': values[5:]
-    }
-
-
-def __parse_distro(distro):
-    values = next(iter(re.findall('([a-z]+)(.+)', distro)))
-    return {'name': values[0], 'version': float(values[1])}
-
-
 def __download_and_install(install_dir, version, url):
     with tempfile.TemporaryDirectory() as download_dir:
-        path, _ = urllib.request.urlretrieve(url, '%s/ghc.tar.xz' % download_dir)
+        path, _ = urllib.request.urlretrieve(
+            url,
+            '%s/ghc.tar.xz' % download_dir
+        )
         with tarfile.open(path) as tar:
             tar.extractall(download_dir)
             working_dir = '%s/ghc-%s' % (download_dir, version)

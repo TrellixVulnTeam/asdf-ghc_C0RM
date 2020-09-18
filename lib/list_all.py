@@ -1,6 +1,5 @@
 from distutils.version import StrictVersion
 
-import gzip
 import re
 import urllib.request
 
