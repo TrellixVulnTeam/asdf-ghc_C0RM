@@ -1,4 +1,5 @@
-from lib.install.filename import parse_filename
+from lib.distro import get_distro
+from lib.filename import parse_filename
 
 import os
 import platform
@@ -14,11 +15,11 @@ BASE_URL = 'https://downloads.haskell.org/~ghc'
 OS = sys.platform
 
 
-def install(install_dir, version):
+def main(install_dir, version):
     filename = __downloadable_filename(
       __sort_by_distro_version(__filter_by_distro(__get_filenames(version)))
     )
-    return __download_and_install(
+    return __install(
       install_dir,
       version,
       '%s/%s/%s' % (BASE_URL, version, filename['filename'])
@@ -40,9 +41,7 @@ def __sort_by_distro_version(filenames):
 
 
 def __filter_by_distro(filenames):
-    distro = __normalize_distro(
-        subprocess.check_output(['lsb_release', '-irs'])
-    )
+    distro = get_distro()
 
     def by_distro(filename):
         is_name = distro['name'] == filename['distro']['name']
@@ -50,15 +49,6 @@ def __filter_by_distro(filenames):
         return is_name and is_version
 
     return filter(by_distro, filenames)
-
-
-def __normalize_distro(distro):
-    values = distro.decode('utf-8').split()
-
-    if values[0] == 'Debian':
-        return {'name': 'deb', 'version': float(values[1])}
-
-    return {'name': values[0], 'version': float(values[1])}
 
 
 def __get_filenames(version):
@@ -75,7 +65,7 @@ def __get_filenames(version):
         )
 
 
-def __download_and_install(install_dir, version, url):
+def __install(install_dir, version, url):
     with tempfile.TemporaryDirectory() as download_dir:
         path, _ = urllib.request.urlretrieve(
             url,
@@ -97,4 +87,4 @@ def __download_and_install(install_dir, version, url):
 if __name__ == '__main__':
     install_dir = os.environ['ASDF_INSTALL_PATH']
     version = os.environ['ASDF_INSTALL_VERSION']
-    install(install_dir, version)
+    main(install_dir, version)

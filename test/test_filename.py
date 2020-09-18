@@ -1,4 +1,4 @@
-from lib.install.filename import parse_filename
+from lib.filename import parse_filename
 
 import unittest
 
