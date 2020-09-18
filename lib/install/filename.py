@@ -12,7 +12,6 @@ def parse_filename(filename):
 
 def __parse_distro(distro):
     values = next(iter(re.findall('([a-z]+)(.*)', distro)))
-
     if values[1]:
         return {'name': values[0], 'version': float(values[1])}
 
