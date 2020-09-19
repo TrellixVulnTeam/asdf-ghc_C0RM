@@ -4,18 +4,10 @@ name: Darwin
 on: [push, pull_request]
 
 jobs:
-  build-asdf:
-    runs-on: macos-latest
-    steps:
-      - uses: asdf-vm/actions/plugin-test@v1
-        with:
-          command: ghc --version
-        env:
-          GITHUB_API_TOKEN: ${{ github.token }}
-
-  build-python:
+  build:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - run: python3 --version
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m flake8
       - run: python3 -m unittest
