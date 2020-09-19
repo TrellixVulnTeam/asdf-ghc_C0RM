@@ -1,7 +1,7 @@
 ---
 name: Linux
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -9,10 +9,15 @@ jobs:
 
     strategy:
       matrix:
-        service:
-          - debian10
-          - debian9
+        container:
+          - debian:10
+          - debian:9
+
+    container:
+      image: ${{ matrix.container }}
 
     steps:
       - uses: actions/checkout@v2
-      - run: docker-compose build ${{ matrix.service }}
+      - run: apt-get update
+      - run: apt-get install -y build-essential ca-certificates python3
+      - run: python3 -m unittest
