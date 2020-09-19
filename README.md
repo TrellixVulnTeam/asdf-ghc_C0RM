@@ -2,3 +2,22 @@
 
 ![Darwin](https://github.com/sestrella/asdf-ghc/workflows/Darwin/badge.svg)
 ![Linux](https://github.com/sestrella/asdf-ghc/workflows/Linux/badge.svg)
+
+GHC plugin for asdf version manager.
+
+## Supported Platforms
+
+- Debian 9, 10
+- Mac OS X
+
+## Requirements
+
+- Python 3
+
+## Install
+
+Run the following command:
+
+```
+asdf plugin-add ghc https://github.com/sestrella/asdf-ghc.git
+```
