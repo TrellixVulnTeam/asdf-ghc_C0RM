@@ -14,5 +14,8 @@ def get_distro(os_name=sys.platform):
 
 
 def os_release():
+    def not_empty(values):
+        return len(values) == 2
+
     with open('/etc/os-release', 'r') as f:
-        return dict(csv.reader(f, delimiter='='))
+        return dict(filter(not_empty, csv.reader(f, delimiter='=')))
