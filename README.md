@@ -7,6 +7,7 @@ GHC plugin for asdf version manager.
 
 ## Supported Platforms
 
+- Centos 7
 - Debian 9, 10
 - Mac OS X
 
