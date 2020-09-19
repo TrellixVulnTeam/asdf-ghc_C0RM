@@ -1,6 +1,7 @@
 from lib.distro import get_distro
 from lib.filename import parse_filename
 
+import gzip
 import os
 import platform
 import re
@@ -57,8 +58,10 @@ def __get_filenames(version):
         is_os = OS in filename
         return is_arch and is_os and filename.endswith('tar.xz')
 
-    with urllib.request.urlopen('%s/%s/' % (BASE_URL, version)) as resp:
-        content = resp.read().decode('utf-8')
+    req = urllib.request.Request('%s/%s/' % (BASE_URL, version))
+    req.add_header('Accept-encoding', 'gzip,deflate')
+    with urllib.request.urlopen(req) as resp:
+        content = gzip.decompress(resp.read()).decode('utf-8')
         return map(
           parse_filename,
           filter(is_tarball, re.findall('(?<=href=")(ghc-.*)(?=")', content))

@@ -1,5 +1,6 @@
 from distutils.version import StrictVersion
 
+import gzip
 import re
 import urllib.request
 
@@ -23,8 +24,10 @@ def __extract_versions(page):
 
 
 def __downloads_page():
-    with urllib.request.urlopen(URL) as resp:
-        return resp.read().decode('utf-8')
+    req = urllib.request.Request(URL)
+    req.add_header('Accept-encoding', 'gzip,deflate')
+    with urllib.request.urlopen(req) as resp:
+        return gzip.decompress(resp.read()).decode('utf-8')
 
 
 if __name__ == '__main__':
