@@ -10,16 +10,26 @@ jobs:
     strategy:
       matrix:
         container:
-          - debian:10
-          - debian:9
+          - image: centos:7
+            family: rhel
+          - image: debian:10
+            family: debian
+          - image: debian:9
+            family: debian
 
     container:
-      image: ${{ matrix.container }}
+      image: ${{ matrix.container.image }}
 
     steps:
       - uses: actions/checkout@v2
-      - run: apt-get update
-      - run: |
+      - if: ${{ matrix.container.family == 'rhel' }}
+        run: |
+          yum check-update && \
+          yum install python3
+
+      - if: ${{ matrix.container.family == 'debian' }}
+        run: |
+          apt-get update && \
           apt-get install -y \
             build-essential \
             ca-certificates \
