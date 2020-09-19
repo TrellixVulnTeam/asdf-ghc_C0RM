@@ -1,6 +1,5 @@
 from lib.distro import get_distro
 
-import sys
 import unittest
 
 
