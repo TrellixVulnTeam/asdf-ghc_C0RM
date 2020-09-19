@@ -4,9 +4,17 @@ name: Darwin
 on: [push]
 
 jobs:
-  build:
+  build-asdf:
     runs-on: macos-latest
+    steps:
+      - uses: asdf-vm/actions/plugin-test@v1
+        with:
+          command: ghc --version
+        env:
+          GITHUB_API_TOKEN: ${{ github.token }}
 
+  build-python:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
       - run: python3 --version
