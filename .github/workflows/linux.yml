@@ -25,6 +25,7 @@ jobs:
       - if: ${{ matrix.container.family == 'rhel' }}
         run: |
           yum check-update && \
+          yum groupinstall -y 'Development Tools' && \
           yum install -y python3
 
       - if: ${{ matrix.container.family == 'debian' }}
