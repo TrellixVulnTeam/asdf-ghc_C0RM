@@ -1,5 +1,7 @@
 # asdf-ghc
 
+**DEPRECATED - This is no longer supported, please consider using [asdf-ghcup](https://github.com/sestrella/asdf-ghcup) instead.**
+
 ![Darwin](https://github.com/sestrella/asdf-ghc/workflows/Darwin/badge.svg)
 ![Linux](https://github.com/sestrella/asdf-ghc/workflows/Linux/badge.svg)
 
